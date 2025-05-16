@@ -1,0 +1,18 @@
+table Valuestyable
+	lineageTag: 8fd8e431-93d5-4330-98cd-0d073ff0c68b
+
+	column Value
+		formatString: 0
+		lineageTag: 4e30a5a1-5b0e-41f2-8bc9-f4792b1e9575
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Value]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Valuestyable = calculated
+		mode: import
+		source = GENERATESERIES(50,1000,100)
+
+	annotation PBI_Id = 0b97d2ec27c4454d9a8c5c673d8dce3e
+

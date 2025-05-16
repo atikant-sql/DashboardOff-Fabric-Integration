@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "DashboardOff-AJ"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "72636e3f-1d53-a383-4d5c-4d7d8d3d5b5e"
+  }
+}

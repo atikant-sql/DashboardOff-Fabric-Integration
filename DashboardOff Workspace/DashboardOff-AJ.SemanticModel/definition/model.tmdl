@@ -1,0 +1,24 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_QueryOrder = ["Sheet1","Table 1 (Sheet1)","Table 1 (Sheet1) (2)","October to Dec 2020","Dataset","Outage Classifications","Table002 (Page 3)","Table003 (Page 4)","dim Outage","Outage Classifications (2)"]
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBIDesktopVersion = 2.139.1678.0 (24.12)+2a034ab280bddf891eb7bb9ebfe6996f9c3a3196
+
+ref table Dataset
+ref table DimDate
+ref table _measures
+ref table 'Slicer for BoxPlot'
+ref table Valuestyable
+ref table 'Outage Classifications'
+ref table 'dim Outage'
+
+ref cultureInfo en-US
+

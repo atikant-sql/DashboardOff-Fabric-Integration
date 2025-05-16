@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "DashboardOff-AJ"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "fa65883c-5539-8cda-4cc7-adb6a2fd7aa2"
+  }
+}

@@ -1,0 +1,115 @@
+expression Sheet1 =
+		let
+		    Source = Excel.Workbook(File.Contents("C:\Users\Atikant(AJ)\Documents\Practice & Trainings\Dataset\Jan to Mar 2020 past outages.xlsx"), null, true),
+		    Sheet1_Sheet = Source{[Item="Sheet1",Kind="Sheet"]}[Data],
+		    #"Changed Type" = Table.TransformColumnTypes(Sheet1_Sheet,{{"Column1", type any}, {"Column2", type text}, {"Column3", type any}, {"Column4", type any}, {"Column5", type any}, {"Column6", type any}, {"Column7", type text}, {"Column8", type any}}),
+		    #"Removed Blank Rows" = Table.SelectRows(#"Changed Type", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null}))),
+		    #"Promoted Headers" = Table.PromoteHeaders(#"Removed Blank Rows", [PromoteAllScalars=true]),
+		    #"Changed Type1" = Table.TransformColumnTypes(#"Promoted Headers",{{"Event ID", Int64.Type}, {"LGA", type text}, {"Start Date", type date}, {"Start Time", type datetime}, {"Customers Interrupted", Int64.Type}, {"Ave Dur. (min)", type number}, {"Reason", type text}, {"Column8", type any}}),
+		    #"Removed Other Columns" = Table.SelectColumns(#"Changed Type1",{"Reason", "Ave Dur. (min)", "Customers Interrupted", "Start Time", "Start Date", "LGA", "Event ID"}),
+		    #"Reordered Columns" = Table.ReorderColumns(#"Removed Other Columns",{"Event ID", "LGA", "Start Date", "Start Time", "Customers Interrupted", "Ave Dur. (min)", "Reason"}),
+		    #"Changed Type2" = Table.TransformColumnTypes(#"Reordered Columns",{{"Start Time", type time}})
+		in
+		    #"Changed Type2"
+	lineageTag: 595dbd03-4cff-4e34-9ced-5c23d3427c65
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression 'Table 1 (Sheet1)' =
+		let
+		    Source = Excel.Workbook(File.Contents("C:\Users\Atikant(AJ)\Documents\Practice & Trainings\Dataset\April to June 2020 past outages.xlsx"), null, false),
+		    Sheet1_sheet = Source{[Item="Sheet1",Kind="Sheet"]}[Data],
+		    FilterNullAndWhitespace = each List.Select(_, each _ <> null and (not (_ is text) or Text.Trim(_) <> "")),
+		    #"Removed Other Columns" = Table.SelectColumns(Sheet1_sheet, List.Select(Table.ColumnNames(Sheet1_sheet), each try not List.IsEmpty(FilterNullAndWhitespace(Table.Column(Sheet1_sheet, _))) otherwise true)),
+		    #"Removed Blank Rows" = Table.SelectRows(#"Removed Other Columns", each not List.IsEmpty(FilterNullAndWhitespace(Record.FieldValues(_)))),
+		    #"Promoted Headers" = Table.PromoteHeaders(#"Removed Blank Rows", [PromoteAllScalars=true]),
+		    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Event ID", Int64.Type}, {"LGA", type text}, {"Start Date", type date}, {"Start Time", type time}, {"Customers Interrupted", Int64.Type}, {"Ave Dur. (min)", type number}, {"Reason", type text}})
+		in
+		    #"Changed Type"
+	lineageTag: 154b6d28-222a-45ae-a8a0-c1bfe0007406
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression 'Table 1 (Sheet1) (2)' =
+		let
+		    Source = Excel.Workbook(File.Contents("C:\Users\Atikant(AJ)\Documents\Practice & Trainings\Dataset\July to September 2020 past outages.xlsx"), null, false),
+		    Sheet1_sheet = Source{[Item="Sheet1",Kind="Sheet"]}[Data],
+		    FilterNullAndWhitespace = each List.Select(_, each _ <> null and (not (_ is text) or Text.Trim(_) <> "")),
+		    #"Removed Blank Rows" = Table.SelectRows(Sheet1_sheet, each not List.IsEmpty(FilterNullAndWhitespace(Record.FieldValues(_)))),
+		    #"Promoted Headers" = Table.PromoteHeaders(#"Removed Blank Rows", [PromoteAllScalars=true]),
+		    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Event ID", Int64.Type}, {"LGA", type text}, {"Start Date", type date}, {"Start Time", type time}, {"Customers Interrupted", Int64.Type}, {"Ave Dur. (min)", type number}, {"Reason", type text}})
+		in
+		    #"Changed Type"
+	lineageTag: 9d94630c-9196-4feb-bd4e-e1bd0f5fce6e
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression 'October to Dec 2020' =
+		let
+		    Source = Excel.Workbook(File.Contents("C:\Users\Atikant(AJ)\Documents\Practice & Trainings\Dataset\October to Dec 2020.xlsx"), null, true),
+		    #"October to Dec 2020_Sheet" = Source{[Item="October to Dec 2020",Kind="Sheet"]}[Data],
+		    #"Promoted Headers" = Table.PromoteHeaders(#"October to Dec 2020_Sheet", [PromoteAllScalars=true]),
+		    #"Changed Type with Locale" = Table.TransformColumnTypes(#"Promoted Headers", {{"Start Date", type date}}, "en-AU"),
+		    #"Changed Type" = Table.TransformColumnTypes(#"Changed Type with Locale",{{"Start Time", type time}})
+		in
+		    #"Changed Type"
+	lineageTag: d8994b79-6b5a-4b6a-821d-80ce14370c51
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression 'Table002 (Page 3)' =
+		let
+		    Source = Pdf.Tables(File.Contents("C:\Users\Atikant(AJ)\Downloads\Outage-Classifications.pdf"), [Implementation="1.3"]),
+		    Table002 = Source{[Id="Table002"]}[Data],
+		    #"Changed Type" = Table.TransformColumnTypes(Table002,{{"Column1", type text}, {"Column2", type text}, {"Column3", type text}}),
+		    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Column1", "Category"}, {"Column2", "Trigger"}, {"Column3", "Definition"}})
+		in
+		    #"Renamed Columns"
+	lineageTag: d105d254-8342-449e-af80-f9176c241653
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression 'Table003 (Page 4)' =
+		let
+		    Source = Pdf.Tables(File.Contents("C:\Users\Atikant(AJ)\Downloads\Outage-Classifications.pdf"), [Implementation="1.3"]),
+		    Table003 = Source{[Id="Table003"]}[Data],
+		    #"Changed Type" = Table.TransformColumnTypes(Table003,{{"Column1", type text}, {"Column2", type text}, {"Column3", type text}}),
+		    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Column1", "Category"}, {"Column2", "Trigger"}, {"Column3", "Definition"}})
+		in
+		    #"Renamed Columns"
+	lineageTag: f357b1a2-99d3-4577-a6c9-a22157c1fa42
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression 'Outage Classifications (2)' =
+		let
+		    Source = Pdf.Tables(File.Contents("C:\Users\Atikant(AJ)\Downloads\Outage-Classifications.pdf"), [Implementation="1.3"]),
+		    Table001 = Source{[Id="Table001"]}[Data],
+		    #"Changed Type" = Table.TransformColumnTypes(Table001,{{"Column1", type text}, {"Column2", type text}, {"Column3", type text}}),
+		    #"Promoted Headers" = Table.PromoteHeaders(#"Changed Type", [PromoteAllScalars=true]),
+		    #"Changed Type1" = Table.TransformColumnTypes(#"Promoted Headers",{{"Category", type text}, {"Trigger", type text}, {"Definition", type text}}),
+		    #"Appended Query" = Table.Combine({#"Changed Type1", #"Table002 (Page 3)", #"Table003 (Page 4)"}),
+		    #"Replaced Value" = Table.ReplaceValue(#"Appended Query","",null,Replacer.ReplaceValue,{"Category"}),
+		    #"Filled Down" = Table.FillDown(#"Replaced Value",{"Category"}),
+		    #"Removed Other Columns" = Table.SelectColumns(#"Filled Down",{"Category"}),
+		    #"Renamed Columns" = Table.RenameColumns(#"Removed Other Columns",{{"Category", "Reason"}})
+		in
+		    #"Renamed Columns"
+	lineageTag: 6318db95-6fc5-48d4-9988-bfe7246ba1f4
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

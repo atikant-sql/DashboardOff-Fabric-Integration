@@ -1,0 +1,52 @@
+table 'Slicer for BoxPlot'
+	lineageTag: bd12578c-fbbb-4f85-bbe3-205aed47255e
+
+	column 'Slicer for BoxPlot'
+		lineageTag: 29e707a9-ef0d-415b-9229-b4fb9fb16e8f
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Slicer for BoxPlot Order'
+
+		relatedColumnDetails
+			groupByColumn: 'Slicer for BoxPlot Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Slicer for BoxPlot Fields'
+		isHidden
+		lineageTag: fb6e0899-723e-468a-98a6-fc9c72bfd970
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Slicer for BoxPlot Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Slicer for BoxPlot Order'
+		isHidden
+		formatString: 0
+		lineageTag: d1aebc25-056d-4624-bf3f-6e61a3ef4c9b
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Slicer for BoxPlot' = calculated
+		mode: import
+		source =
+				{
+				    ("Duration Range", NAMEOF('Dataset'[DurationRange]), 0),
+				    ("LGA", NAMEOF('Dataset'[LGA]), 1),
+				    ("Event", NAMEOF('dim Outage'[Event]), 2),
+				    ("Time Range", NAMEOF('Dataset'[TimeRange]), 3),
+				    ("Month Name", NAMEOF('DimDate'[Month Name]), 4),
+				    ("Day Name", NAMEOF('DimDate'[Day Name]), 5)
+				}
+
+	annotation PBI_Id = c4a6e6ba341a4a709d6a23d5e17c3abc
+

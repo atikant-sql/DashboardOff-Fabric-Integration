@@ -1,0 +1,134 @@
+table _measures
+	lineageTag: 63c1ea47-f269-45bc-9530-d93834b6d09d
+
+	measure 'Customers per outage' = ```
+			
+			DIVIDE(
+			    
+			    [# of Customers Impacted],COUNTROWS('Dataset'),
+			    0
+			)
+			
+			```
+		lineageTag: c4b12593-b091-42a9-8119-1dfeedcbb704
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '# of Outages' = DISTINCTCOUNT('Dataset'[Event ID])
+		formatString: 0
+		lineageTag: cb776e78-e597-4946-befb-b0777f5036b5
+
+	measure '# of Customers Impacted' = SUM('Dataset'[Customers Interrupted])
+		formatString: #,0
+		lineageTag: 8ffd7e96-0815-4aba-9aeb-930438f113b1
+
+	measure '# of Event Types' = DISTINCTCOUNT('Dataset'[Reason])
+		formatString: 0
+		lineageTag: d2cdbaab-da2d-451d-bbda-02afa148f3d8
+
+	measure '# of LGA Locations' = DISTINCTCOUNT('Dataset'[LGA])
+		formatString: 0
+		lineageTag: 1ac48e0c-cf16-4019-9b4e-73cc70240cd7
+
+	measure 'Avg Duration MIN' = MIN( 'Dataset'[Ave Dur. (min)] )
+		displayFolder: BoxPlot
+		lineageTag: dd5310d2-c947-4675-83b6-4952248785d3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Duration MAX' = MAX( 'Dataset'[Ave Dur. (min)] )
+		displayFolder: BoxPlot
+		lineageTag: ec6b549b-b886-425c-a936-9a4253f214e5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Duration MEDIAN' = MEDIAN( 'Dataset'[Ave Dur. (min)] )
+		displayFolder: BoxPlot
+		lineageTag: a63ab697-514a-4d48-bdda-733cce3733f1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Duration Percentile 25' = PERCENTILE.INC('Dataset'[Ave Dur. (min)], 0.25)
+		displayFolder: BoxPlot
+		lineageTag: bc0929fe-89ae-4fcb-b5f1-e6c4d2da373d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Duration Percentile 75' = PERCENTILE.INC('Dataset'[Ave Dur. (min)], 0.75)
+		displayFolder: BoxPlot
+		lineageTag: d43ac487-1027-40eb-aef3-293d1a2c3840
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Duration IQR 25-50' = [Avg Duration MEDIAN] - [Avg Duration Percentile 25]
+		displayFolder: BoxPlot
+		lineageTag: 6c5d0b2b-4fc4-4b92-801c-844846a9a71b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Duration IQR 50-75' = [Avg Duration Percentile 75]-[Avg Duration MEDIAN]
+		displayFolder: BoxPlot
+		lineageTag: 1c62668d-7b69-4cfc-ad15-848d8dc9eb7c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Duration IQR' = [Avg Duration Percentile 75] - [Avg Duration Percentile 25]
+		displayFolder: BoxPlot
+		lineageTag: e02f2501-d326-44b2-974c-32f2400438d2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Duration AVERAGE' = AVERAGE('Dataset'[Ave Dur. (min)])
+		displayFolder: BoxPlot
+		lineageTag: 264f0917-497f-410d-82c6-9d0aa0f57c0d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Values = GENERATESERIES(50,1000,100)
+		formatString: 0
+		displayFolder: BoxPlot
+		lineageTag: bf34777f-cd31-44ad-b055-e8a510cb5e2c
+
+	measure 'Outages with Percentage' = ```
+			
+			VAR OutagesCount = DISTINCTCOUNT('Dataset'[Event ID])
+			VAR TotalCount = CALCULATE(DISTINCTCOUNT('Dataset'[Event ID]), ALL('Dataset'))
+			RETURN 
+			    FORMAT(OutagesCount, "0") & " (" & FORMAT(DIVIDE(OutagesCount, TotalCount, 0), "0.00%") & ")"
+			
+			```
+		lineageTag: 99d41c1e-881d-4c19-ae34-e6b5fa98ec1a
+
+	measure Color = IF([# of Customers Impacted]>[Average Customers Impacted],"#256c78","#37B0C5")
+		lineageTag: a70c4a01-0fa0-4836-afff-000031124fd2
+
+	measure 'Average Customers Impacted' = ```
+			
+			AVERAGEX(
+			    VALUES('DimDate'[Month Name]),  // Replace with the column that represents months
+			    [# of Customers Impacted]
+			)
+			
+			```
+		lineageTag: 98e4793c-1e59-40a6-8f33-cd6434df5ff8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Column
+		isHidden
+		formatString: 0
+		lineageTag: 7e20a901-f208-4592-8eb9-ea1b248c760d
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Column]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _measures = calculated
+		mode: import
+		source = Row("Column", BLANK())
+
+	annotation PBI_Id = 1bdd1bc2bd35476f93a123d76e1a3905
+
+	annotation 436ba87b-9c83-4389-a31b-ebd06a36be98 = {"Expression":""}
+

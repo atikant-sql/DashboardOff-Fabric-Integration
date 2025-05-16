@@ -1,0 +1,161 @@
+table Dataset
+	lineageTag: 5971f196-55e1-4e7b-a7d3-4687b85ed8e3
+
+	column 'Event ID'
+		dataType: string
+		lineageTag: d02ab05b-d2c4-41cf-a83f-80702cb839ce
+		summarizeBy: none
+		sourceColumn: Event ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column LGA
+		dataType: string
+		lineageTag: d95506f5-8c4d-489b-8e5a-9144c88682ad
+		dataCategory: Place
+		summarizeBy: none
+		sourceColumn: LGA
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Start Date'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: befcfc1b-7c7b-4d40-8ee3-7201aabd8994
+		summarizeBy: none
+		sourceColumn: Start Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Start Time'
+		dataType: dateTime
+		formatString: Long Time
+		lineageTag: 47f6cb60-5edf-4050-b6bd-0ce37db6e63f
+		summarizeBy: none
+		sourceColumn: Start Time
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Time
+
+	column 'Customers Interrupted'
+		dataType: int64
+		formatString: 0
+		lineageTag: 472f9e4d-e7bc-40da-bca1-aaa6ca4c5863
+		summarizeBy: sum
+		sourceColumn: Customers Interrupted
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Ave Dur. (min)'
+		dataType: double
+		formatString: 0.00
+		lineageTag: fa606e82-20ce-4eef-84cd-d10256774ab3
+		summarizeBy: sum
+		sourceColumn: Ave Dur. (min)
+
+		annotation SummarizationSetBy = Automatic
+
+	column Reason
+		dataType: string
+		lineageTag: 77f4951e-210e-455d-a03c-5c09a23eca2e
+		summarizeBy: none
+		sourceColumn: Reason
+
+		annotation SummarizationSetBy = Automatic
+
+	column Custom_Time
+		dataType: dateTime
+		formatString: Long Time
+		lineageTag: f777e779-844c-4438-b84d-b2ccedff7dc5
+		summarizeBy: none
+		sourceColumn: Custom_Time
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Time
+
+	column TimeRange
+		dataType: string
+		lineageTag: 17bf6e63-ca18-4c51-a8f3-7ab924a68941
+		summarizeBy: none
+		sourceColumn: TimeRange
+		sortByColumn: TimeRangeSort
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column DurationRange
+		dataType: string
+		lineageTag: 7ebf55ca-a553-4301-a3a3-a37c8cbbd0f1
+		summarizeBy: none
+		sourceColumn: DurationRange
+		sortByColumn: DurationRangeSort
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column TimeRangeSort
+		dataType: int64
+		formatString: 0
+		lineageTag: 588d9282-feaf-4403-9ae0-61cfe89f4f99
+		summarizeBy: sum
+		sourceColumn: TimeRangeSort
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: b4799134-db4c-4be3-892c-418a11a2088c
+		dataCategory: Country
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: 254fbb43-73a7-4d55-a785-4b8e68fe5c3e
+		dataCategory: StateOrProvince
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	column DurationRangeSort
+		dataType: string
+		lineageTag: 73bd57fc-2bac-421a-be84-08c0db3793fb
+		summarizeBy: none
+		sourceColumn: DurationRangeSort
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dataset = m
+		mode: import
+		source =
+				let
+				    Source = Table.Combine({Sheet1, #"Table 1 (Sheet1)", #"Table 1 (Sheet1) (2)", #"October to Dec 2020"}),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Event ID", type text}, {"LGA", type text}, {"Customers Interrupted", Int64.Type}, {"Ave Dur. (min)", type number}, {"Reason", type text}}),
+				    #"Added Custom" = Table.AddColumn(#"Changed Type", "Custom_Time", each Number.Round(Number.From([Start Time]) * (60*24/60))/(60*24/60)),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"Custom_Time", type time}}),
+				    #"Replaced Errors" = Table.ReplaceErrorValues(#"Changed Type1", {{"Custom_Time", #time(0, 0, 0)}}),
+				    #"Added Conditional Column" = Table.AddColumn(#"Replaced Errors", "TimeRange", each if [Custom_Time] <= #time(4, 0, 0) then "12AM-4AM" else if [Custom_Time] <= #time(8, 0, 0) then "4AM-8AM" else if [Custom_Time] <= #time(12, 0, 0) then "8AM-12PM" else if [Custom_Time] <= #time(16, 0, 0) then "12PM-4PM" else if [Custom_Time] <= #time(20, 0, 0) then "4PM-8PM" else "8PM-12AM"),
+				    #"Changed Type2" = Table.TransformColumnTypes(#"Added Conditional Column",{{"TimeRange", type text}}),
+				    #"Added Conditional Column1" = Table.AddColumn(#"Changed Type2", "DurationRange", each if [#"Ave Dur. (min)"] <= 30 then "0-30 mins" else if [#"Ave Dur. (min)"] <= 60 then "30-60 mins" else if [#"Ave Dur. (min)"] <= 120 then "60-120 mins" else if [#"Ave Dur. (min)"] <= 180 then "120-180 mins" else if [#"Ave Dur. (min)"] <= 240 then "180-240 mins" else ">240 mins"),
+				    #"Added Conditional Column2" = Table.AddColumn(#"Added Conditional Column1", "TimeRangeSort", each if [TimeRange] = "12AM-4AM" then 1 else if [TimeRange] = "4AM-8AM" then 2 else if [TimeRange] = "8AM-12PM" then 3 else if [TimeRange] = "12PM-4PM" then 4 else if [TimeRange] = "4PM-8PM" then 5 else if [TimeRange] = "8PM-12AM" then 6 else null),
+				    #"Added Custom1" = Table.AddColumn(#"Added Conditional Column2", "Country", each "Australia"),
+				    #"Added Custom2" = Table.AddColumn(#"Added Custom1", "State", each "New South Wales"),
+				    #"Changed Type4" = Table.TransformColumnTypes(#"Added Custom2",{{"Country", type text}, {"State", type text}, {"TimeRangeSort", Int64.Type}, {"DurationRange", type text}}),
+				    #"Added Conditional Column3" = Table.AddColumn(#"Changed Type4", "DurationRangeSort", each if [DurationRange] = "0-30 mins" then 1 else if [DurationRange] = "30-60 mins" then 2 else if [DurationRange] = "60-120 mins" then 3 else if [DurationRange] = "120-180 mins" then 4 else if [DurationRange] = "180-240 mins" then 5 else if [DurationRange] = ">240 mins" then 6 else 7),
+				    #"Capitalized Each Word" = Table.TransformColumns(#"Added Conditional Column3",{{"LGA", Text.Proper, type text}})
+				in
+				    #"Capitalized Each Word"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

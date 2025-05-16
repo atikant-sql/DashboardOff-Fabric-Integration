@@ -1,0 +1,12 @@
+relationship 75dfee7f-c258-2984-7eab-59dd29aaccce
+	fromColumn: Dataset.'Start Date'
+	toColumn: DimDate.Date
+
+relationship 2c58485d-21d4-28e6-ca6f-fd50b03417ea
+	fromColumn: 'Outage Classifications'.Category
+	toColumn: 'dim Outage'.Event
+
+relationship 0767f6d0-dac8-b5f6-42f3-a955e415d0ea
+	fromColumn: Dataset.Reason
+	toColumn: 'dim Outage'.Event
+
